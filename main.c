@@ -22,7 +22,7 @@ int main() {
 	printf("brk_current: %d \n", brk_current);
 	printf("diferenca: %d \n", alloc_pointers - initial_brk);
 
-	printf("in use: %d , %d size \n", *((long long*) (alloc_pointers - 26)), *((long long*) (alloc_pointers - 18)));
+	printf("in use: %d , %d size \n", *((long long*) (alloc_pointers - 16)), *((long long*) (alloc_pointers - 8)));
 	
 
 	

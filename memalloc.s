@@ -39,6 +39,7 @@ memory_alloc:
     jne .dont_alloc
     # alloc new block here
     addq $16, %r9       # this is the address that needs to be returned
+    movq %r9, %r12     # save the address
     addq %rdi, %r9     # now r9 contains new brk
     # here we set the brk
     movq %r9, %rdi
@@ -51,7 +52,7 @@ memory_alloc:
     movq %r9, brk_current
   
     # now return %r9
-    movq %r9, %rax
+    movq %r12, %rax
     ret
 
 .dont_alloc:
