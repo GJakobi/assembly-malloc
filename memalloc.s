@@ -48,11 +48,11 @@ alloc_new_block:
     movq $12, %rax
     syscall
     # now set *brk_current = 1, *(brk_current + 8) = %r10, and brk_current = %r9 
-    movq brk_current, %r8
+    movq brk_current, %r8 # old brk_current contains the start address of the new block
     movq $1, (%r8)
     movq %r10, 8(%r8)
-    movq %r9, brk_current
-    # now return %r9
+    movq %r9, brk_current # set the new brk_current
+    # now return the address of the new data block
     movq %r12, %rax
     ret
 
