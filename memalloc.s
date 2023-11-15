@@ -104,7 +104,17 @@ alloc_new_block:
 
 
 memory_free:
-    # argument is in rdi
+    # check if the address is in the range of the heap
+    movq brk_original, %r8
+    movq brk_current, %r9
+    cmpq %rdi, %r8
+    jg .invalid_address
+    cmpq %rdi, %r9
+    jl .invalid_address
+    # here we know that the address is in the range of the heap
     movq $0, -16(%rdi)
     ret
 
+.invalid_address:
+    movq $0, %rax
+    ret
