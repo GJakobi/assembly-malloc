@@ -3,7 +3,6 @@
 
 #include "memalloc.h" 							
 
-
 void double_alloc_after_free(void **pointers_array){
 	pointers_array[1] = memory_alloc(50);
 	pointers_array[2] = memory_alloc(100);
@@ -19,11 +18,7 @@ int main() {
 	
 	setup_brk();
 	void *initial_brk = brk_original;
-	void *alloc_pointers[3];
-	void *teste, *teste2;
-
-	printf("brk original: %d\n", brk_original);
-
+	void *alloc_pointers[3], *test1;
 
 	simple_alloc(alloc_pointers);
 	printf("==>> ALOCANDO UM ESPAÇO DE 100 BYTES:\n");
@@ -49,6 +44,13 @@ int main() {
 	printf("\tIND. DE USO: %s\n", *((long long*) (alloc_pointers[1]+50)) == 0 ? "CORRETO!" : "INCORRETO!");
 	printf("\tTAMANHO: %s\n", *((long long*) (alloc_pointers[1]+58)) == 34 ? "CORRETO!" : "INCORRETO!");
 
+	test1 = memory_alloc(34);
+	printf("==>> ALOCANDO O BLOCO LIVRE NO MEIO: \n");
+	printf("\tLOCAL: %s\n", test1-16 == alloc_pointers[1]+50 ? "CORRETO!" : "INCORRETO!");
+	printf("\tIND. DE USO: %s\n", *((long long*) (test1-16)) == 1 ? "CORRETO!" : "INCORRETO!");
+	printf("\tTAMANHO: %s\n", *((long long*) (test1-8)) == 34 ? "CORRETO!" : "INCORRETO!");
+
+
 	printf("==>> DESALOCANDO TUDO:\n");
 	memory_free(alloc_pointers[1]);
 	memory_free(alloc_pointers[2]);
@@ -61,33 +63,6 @@ int main() {
 	printf("==>> DESALOCANDO A PILHA (ILEGAL):\n");
 	unsigned int alloc_return = memory_free((void*) alloc_pointers);
 	if (!alloc_return) printf("\tO RETORNO DA LIBERAÇÃO FOI NULL!\n");
-
-
-
-
-
-
-
-
-
-	// int toBeAllocated = 84;
-	// // [26669056,       26669072,                      26669155                26669172                26669188
-	// //  brk original    start of first data block     start of second block     end of second block		start of third block
-	// teste = memory_alloc(toBeAllocated);
-
-	// printf("teste: %d\n", teste);
-	// // memory_free(teste);
-
-	// // teste2 = memory_alloc(toBeAllocated + 1);
-
-
-
-	// // printf("teste2: %d \n", teste2);
-
-
-
-	// printf("endereco do primeiro bloco: %d, em uso: %d, tamanho: %d\n", teste, *((long long*) (teste-16)), *((long long*) (teste-8)));
-	// // printf("endereco do segundo bloco: %d, em uso: %d, tamanho: %d\n", ((long long*) (teste+toBeAllocated+16)), *((long long*) (teste+toBeAllocated)), *((long long*) (teste+toBeAllocated+8)));
 
 	return 0;
 }
