@@ -18,7 +18,7 @@ int main() {
 	
 	setup_brk();
 	void *initial_brk = brk_original;
-	void *alloc_pointers[3], *test1;
+	void *alloc_pointers[3], *test1, *test2, *test3;
 
 	simple_alloc(alloc_pointers);
 	printf("==>> ALOCANDO UM ESPAÇO DE 100 BYTES:\n");
@@ -58,6 +58,17 @@ int main() {
 	printf("\tTAMANHO: %s\n", *((long long*) (alloc_pointers[1]-8)) == 50 ? "CORRETO!" : "INCORRETO!");
 	printf("\tIND. DE USO: %s\n", *((long long*) (alloc_pointers[2]-16)) == 0 ? "CORRETO!" : "INCORRETO!");
 	printf("\tTAMANHO: %s\n", *((long long*) (alloc_pointers[2]-8)) == 100 ? "CORRETO!" : "INCORRETO!");
+
+
+	test2 = memory_alloc(25);
+	test3 = memory_alloc(9);
+	printf("==>> DIVIDINDO PRIMEIRO BLOCO DE 50 BYTES EM 25 E 9:\n");
+	printf("\tLOCAL PRIMEIRO: %s\n", test2 == alloc_pointers[1] ? "CORRETO!" : "INCORRETO!");
+	printf("\tIND. DE USO PRIMEIRO: %s\n", *((long long*) (test2-16)) == 1 ? "CORRETO!" : "INCORRETO!");
+	printf("\tTAMANHO PRIMEIRO: %s\n", *((long long*) (test2-8)) == 25 ? "CORRETO!" : "INCORRETO!");
+	printf("\tLOCAL SEGUNDO: %s\n", test3-16 == test2+25 ? "CORRETO!" : "INCORRETO!");
+	printf("\tIND. DE USO SEGUNDO: %s\n", *((long long*) (test3-16)) == 1 ? "CORRETO!" : "INCORRETO!");
+	printf("\tTAMANHO SEGUNDO: %s\n", *((long long*) (test3-8)) == 9 ? "CORRETO!" : "INCORRETO!");
 
 
 	printf("==>> DESALOCANDO A PILHA (ILEGAL):\n");
