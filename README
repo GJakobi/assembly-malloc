@@ -1,0 +1,31 @@
+Aluno: Gustavo F. Jakobi GRR20221253
+
+Estratégias de implementação:
+Foram utilizadas duas variáveis globais para armazenar informações relacionadas ao brk: brk_original, 
+que guarda o brk inicial da heap, e brk_current, que guarda onde está o brk atual da heap. Inicialmente 
+ambos começam com 0, e após chamar a função setup_brk ficam com o mesmo valor.
+
+Função setup_brk: 
+    - Obtém o valor de brk atual através de uma syscall e armazena em brk_current e brk_original.
+
+Função dismiss_brk: 
+    - Restaura o valor de brk para o valor inicial, armazenado em brk_original.
+
+Função memory_alloc: 
+    - Função mais complexa do programa, que segue a estratégia first-fit para alocar memória. 
+    Primeiramente é salvo os valores de brk_original e brk_current em registradores, assim como a quantidade 
+    de bytes solicitada. Após isso é feita a comparação do valor de brk_current com o valor de brk_original,
+    pois se eles forem iguais isso significa que é necessário alocar um novo bloco, caso contrário, isso quer dizer
+    que algum bloco já foi alocado previamente e é feito um jump para uma função que busca por um bloco livre.
+    - Alocação de novo bloco: O registrador que guarda o brk_current é incrementado para o novo valor de brk após a alocação, 
+    e é feita uma syscall para incrementar esse valor. Após isso é settado o bloco como "em uso" 
+    e o valor correto do bloco de dados.
+    - Busca por bloco livre: É feito um loop que passa verificando primeiramente se o bloco esta livre e é grande 
+    o suficiente. Caso seja, é verificado se ele é grande o suficiente para ser dividido em dois, 
+    e caso seja, é feito a divisão e o primeiro bloco é settado como "em uso" e o segundo fica livre. Caso o bloco não
+    seja grande o suficiente para ser divido em dois, ele simplesmente é settado como "em uso".
+
+Função memory_free:
+    - Primeiramente verifica-se se o endereço passado como parâmetro é válido, ou seja, se ele está dentro
+    do intervalo de endereços da heap. Se for inválido, zero é retornado. Caso seja válido, o byte de "em uso"
+    do bloco é marcado como 0.
