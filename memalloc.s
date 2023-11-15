@@ -36,7 +36,7 @@ memory_alloc:
     movq brk_current, %r9 # r9 contains the current brk
     movq %rdi, %r10 # save rdi
     cmpq %r8, %r9 # if brk_current == brk_original alloc memory
-    jne .dont_alloc
+    jne .find_free_block
 
 alloc_new_block:
     # alloc new block here
@@ -52,13 +52,56 @@ alloc_new_block:
     movq $1, (%r8)
     movq %r10, 8(%r8)
     movq %r9, brk_current
-
     # now return %r9
     movq %r12, %rax
     ret
 
-.dont_alloc:
+.find_free_block:
+    # start a loop
+
+    movq %r8, %r11
+
+    # first, check if the first block is free
+    cmpq $0, (%r11)
+    jne .a_ser_definido1
+    # here we know that this block is free
+    cmpq 8(%r11), %r10  #  - it is free, then whe check if the size in the current_block + 8 is >= rdi, then we should use this block
+    jge .a_ser_definido2
+    # here we know that this block is free and it is big enough
+    # now we should calculate if remains at least 17 bytes to split the block
+    movq 8(%r11), %r12 # r12 = size of current block
+    subq %r10, %r12 # r12 = size of current block - rdi
+    cmpq $17, %r12 # if r12 >= 17, then we can split the block
+    jl .a_ser_definido3
+    # here we know that we can split the block
+    movq $1, (%r11) # set the first byte to 1
+    movq %r10, 8(%r11) # set the size of the block
+    addq $16, %r11 # r11 = r11 + 16
+    movq %r11, %r13 # save the address of the first block
+    # now we should set the second block
+    addq %r10, %r11 # r11 = r11 + r10
+    movq $0, (%r11) # set the first byte of the second block to 0
+    subq $16, %r12 # r12 = r12 - 16
+    movq %r12, 8(%r11) # set the size of the second block
+    # theoretically, everything is right and we can return the address of the first block
+    movq %r13, %rax
     ret
+
+
+.a_ser_definido1:
+    movq $69, %rax
+    ret
+
+
+.a_ser_definido2:
+    movq %r10, %rax
+    ret
+
+
+.a_ser_definido3:
+    movq $71, %rax
+    ret
+
 
 memory_free:
     # argument is in rdi

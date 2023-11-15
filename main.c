@@ -20,6 +20,9 @@ int main() {
 	setup_brk();
 	void *initial_brk = brk_original;
 	void *alloc_pointers[3];
+	void *teste;
+
+	printf("brk original: %d\n", brk_original);
 
 	simple_alloc(alloc_pointers);
 	printf("==>> ALOCANDO UM ESPAÇO DE 100 BYTES:\n");
@@ -31,6 +34,17 @@ int main() {
 	memory_free(alloc_pointers[0]);
 	printf("\tIND. DE USO: %s\n", *((long long*) (alloc_pointers[0]-16)) == 0 ? "CORRETO!" : "INCORRETO!");
 	printf("\tTAMANHO: %s\n", *((long long*) (alloc_pointers[0]-8)) == 100 ? "CORRETO!" : "INCORRETO!");
+
+	int toBeAllocated = 83;
+
+	teste = memory_alloc(toBeAllocated);
+
+	// printf("%d\n", teste);
+
+
+
+	printf("endereco do primeiro bloco: %d, em uso: %d, tamanho: %d\n", teste, *((long long*) (teste-16)), *((long long*) (teste-8)));
+	printf("endereco do segundo bloco: %d, em uso: %d, tamanho: %d\n", ((long long*) (teste+toBeAllocated+16)), *((long long*) (teste+toBeAllocated)), *((long long*) (teste+toBeAllocated+8)));
 
 	return 0;
 }
