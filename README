@@ -19,10 +19,10 @@ Função memory_alloc:
     que algum bloco já foi alocado previamente e é feito um jump para uma função que busca por um bloco livre.
     - Alocação de novo bloco: O registrador que guarda o brk_current é incrementado para o novo valor de brk após a alocação, 
     e é feita uma syscall para incrementar esse valor. Após isso é settado o bloco como "em uso" 
-    e o valor correto do bloco de dados.
+    e o tamanho correto do bloco de dados.
     - Busca por bloco livre: É feito um loop que passa verificando primeiramente se o bloco esta livre e é grande 
     o suficiente. Caso seja, é verificado se ele é grande o suficiente para ser dividido em dois, 
-    e caso seja, é feito a divisão e o primeiro bloco é settado como "em uso" e o segundo fica livre. Caso o bloco não
+    se sim, é feito a divisão e o primeiro bloco é settado como "em uso" e o segundo fica livre. Caso o bloco não
     seja grande o suficiente para ser divido em dois, ele simplesmente é settado como "em uso".
 
 Função memory_free:
