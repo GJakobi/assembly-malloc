@@ -32,11 +32,13 @@ dismiss_brk:
 
 memory_alloc:
     # argument is in rdi
-    movq brk_original, %r8
-    movq brk_current, %r9
+    movq brk_original, %r8 # r8 contains the original brk
+    movq brk_current, %r9 # r9 contains the current brk
     movq %rdi, %r10 # save rdi
     cmpq %r8, %r9 # if brk_current == brk_original alloc memory
     jne .dont_alloc
+
+alloc_new_block:
     # alloc new block here
     addq $16, %r9       # this is the address that needs to be returned
     movq %r9, %r12     # save the address
@@ -50,7 +52,7 @@ memory_alloc:
     movq $1, (%r8)
     movq %r10, 8(%r8)
     movq %r9, brk_current
-  
+
     # now return %r9
     movq %r12, %rax
     ret
@@ -59,5 +61,7 @@ memory_alloc:
     ret
 
 memory_free:
+    # argument is in rdi
+    movq $0, -16(%rdi)
     ret
 
