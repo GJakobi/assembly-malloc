@@ -86,8 +86,7 @@ alloc_new_block:
     movq %r13, %rax
     ret
 
-
-# the block is not free, then we go to the next block
+# the block is not free, so we go to the next block
 .go_to_next_block:
     addq 8(%r11), %r11 # r11 = r11 + size of current block
     addq $16, %r11 # r11 = r11 + 16 -> now we are at the next block
@@ -96,12 +95,10 @@ alloc_new_block:
     # here we know that we have to alloc a new block
     jmp alloc_new_block
 
-
 .finish_without_split:
     addq $16, %r11 # r11 = r11 + 16
     movq %r11, %rax
     ret
-
 
 memory_free:
     # check if the address is in the range of the heap
