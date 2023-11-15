@@ -57,7 +57,7 @@ alloc_new_block:
     ret
 
 .find_free_block:
-    movq %r8, %r11
+    movq %r8, %r11 # r11 contains the address of the first block
 
     .loop:
     # first, check if the first block is free
@@ -67,18 +67,18 @@ alloc_new_block:
     cmpq 8(%r11), %r10  #  - it is free, then whe check if the size in the *(current_block + 8) is >= rdi, then we should use this block
     jg .go_to_next_block
     # here we know that this block is free and it is big enough
+    movq $1, (%r11) # set the first byte to 1
     # now we should calculate if remains at least 17 bytes to split the block
     movq 8(%r11), %r12 # r12 = size of current block
     subq %r10, %r12 # r12 = size of current block - rdi
     cmpq $17, %r12 # if r12 >= 17, then we can split the block
-    jl .a_ser_definido3
+    jl .finish_without_split
     # here we know that we can split the block
-    movq $1, (%r11) # set the first byte to 1
-    movq %r10, 8(%r11) # set the size of the block
+    movq %r10, 8(%r11) # set the size of the first block
     addq $16, %r11 # r11 = r11 + 16
     movq %r11, %r13 # save the address of the first block
     # now we should set the second block
-    addq %r10, %r11 # r11 = r11 + r10
+    addq %r10, %r11 # r11 = r11 + requested size, now r11 points to the second block
     movq $0, (%r11) # set the first byte of the second block to 0
     subq $16, %r12 # r12 = r12 - 16
     movq %r12, 8(%r11) # set the size of the second block
@@ -96,11 +96,10 @@ alloc_new_block:
     # here we know that we have to alloc a new block
     jmp alloc_new_block
 
-    
 
-
-.a_ser_definido3:
-    movq $71, %rax
+.finish_without_split:
+    addq $16, %r11 # r11 = r11 + 16
+    movq %r11, %rax
     ret
 
 
