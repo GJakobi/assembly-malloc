@@ -57,16 +57,15 @@ alloc_new_block:
     ret
 
 .find_free_block:
-    # start a loop
-
     movq %r8, %r11
 
+    .loop:
     # first, check if the first block is free
     cmpq $0, (%r11)
-    jne .a_ser_definido1
+    jne .go_to_next_block
     # here we know that this block is free
-    cmpq 8(%r11), %r10  #  - it is free, then whe check if the size in the current_block + 8 is >= rdi, then we should use this block
-    jge .a_ser_definido2
+    cmpq 8(%r11), %r10  #  - it is free, then whe check if the size in the *(current_block + 8) is >= rdi, then we should use this block
+    jg .go_to_next_block
     # here we know that this block is free and it is big enough
     # now we should calculate if remains at least 17 bytes to split the block
     movq 8(%r11), %r12 # r12 = size of current block
@@ -88,14 +87,16 @@ alloc_new_block:
     ret
 
 
-.a_ser_definido1:
-    movq $69, %rax
-    ret
+# the block is not free, then we go to the next block
+.go_to_next_block:
+    addq 8(%r11), %r11 # r11 = r11 + size of current block
+    addq $16, %r11 # r11 = r11 + 16 -> now we are at the next block
+    cmpq %r9, %r11 # if r11 < r9, then we should continue the loop
+    jl .loop
+    # here we know that we have to alloc a new block
+    jmp alloc_new_block
 
-
-.a_ser_definido2:
-    movq %r10, %rax
-    ret
+    
 
 
 .a_ser_definido3:
